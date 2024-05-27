@@ -1,0 +1,273 @@
+{
+	"name": "3 incremental_load_onpremSQL_to_Bronze",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup for incrementalload table list",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "select * from [stg].[maintanancetables]\nwhere Load_Type='I' and Status='1'\n",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_azure_sql_server",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach all incrementalload table list",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup for incrementalload table list",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup for incrementalload table list').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Watermarkdatetime",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "select watermarkdate from [dbo].[watermarktable] where Tablename='@{item().TableName}'",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_azure_sql_server",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "modifieddatetime",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "select max(ModifiedDate) ModifiedDate from @{item().SchemaName}.@{item().TableName}",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_onprem_sql_efnprojDB",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Copy data from onprem to bronze layer",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Watermarkdatetime",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "modifieddatetime",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat('select  * from  ',item().SchemaName,'.',item().TableName,' WHERE ModifiedDate > ''',activity('Watermarkdatetime').output.firstRow.watermarkdate,'''and ModifiedDate <=''' ,activity('modifieddatetime').output.firstRow.ModifiedDate,'''')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_onprem_sql_incrementalload_tables",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_onprem_sql__Broze_incrementalload_Tables",
+									"type": "DatasetReference",
+									"parameters": {
+										"File": {
+											"value": "@concat(item().SchemaName,'-',item().TableName)",
+											"type": "Expression"
+										},
+										"FileName": {
+											"value": "@concat(item().SchemaName,'-',item().TableName,'.csv')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Update the watermark table",
+							"type": "SqlServerStoredProcedure",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [
+								{
+									"activity": "Copy data from onprem to bronze layer",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[usp_watermark_modifieddate]",
+								"storedProcedureParameters": {
+									"Modifieddate": {
+										"value": {
+											"value": "@activity('modifieddatetime').output.firstRow.ModifiedDate",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"TableName": {
+										"value": {
+											"value": "@item().TableName",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_Azure_SQL",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Update watermark",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Copy data from onprem to bronze layer",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_Azure_SQL",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "update [dbo].[watermarktable] set watermarkdate='@{activity('modifieddatetime').output.firstRow.ModifiedDate}' where Tablename='@{item().TableName}'",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2024-05-26T14:27:23Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

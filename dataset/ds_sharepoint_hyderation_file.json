@@ -1,0 +1,43 @@
+{
+	"name": "ds_sharepoint_hyderation_file",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureDataLakeStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Sheet1",
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Hyderation_file.xlsx",
+				"fileSystem": "sharepoint"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "S.No",
+				"type": "String"
+			},
+			{
+				"name": "SchemaName",
+				"type": "String"
+			},
+			{
+				"name": "TableName",
+				"type": "String"
+			},
+			{
+				"name": "Load_Type",
+				"type": "String"
+			},
+			{
+				"name": "Status",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

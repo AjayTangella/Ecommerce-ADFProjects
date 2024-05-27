@@ -1,0 +1,17 @@
+{
+	"name": "ds_azure_sql_server",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_Azure_SQL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "stg",
+			"table": "maintanancetables"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

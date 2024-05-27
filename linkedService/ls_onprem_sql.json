@@ -1,0 +1,29 @@
+{
+	"name": "ls_onprem_sql",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"server": "AJAY",
+			"database": "Efnproject",
+			"encrypt": "optional",
+			"trustServerCertificate": false,
+			"hostNameInCertificate": "",
+			"authenticationType": "SQL",
+			"userName": "sa",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_AzureKeyVault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "EfnProject-Password"
+			}
+		},
+		"connectVia": {
+			"referenceName": "onprem-integrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

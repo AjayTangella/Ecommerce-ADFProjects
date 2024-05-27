@@ -1,0 +1,9 @@
+{
+	"name": "Efn-Proj",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "c432d7d5-91d6-4c79-8139-1301012b483b",
+		"tenantId": "495fcea2-100f-43e4-8570-d0f55a6bd23f"
+	}
+}
