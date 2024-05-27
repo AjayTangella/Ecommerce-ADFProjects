@@ -1157,6 +1157,30 @@
 							"waitOnCompletion": true,
 							"parameters": {}
 						}
+					},
+					{
+						"name": "Incrementallload from onprem to Bronze",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Execute Hyderationfile",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "3 incremental_load_onpremSQL_to_Bronze",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -1172,7 +1196,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/1 Hyderationfile moment')]",
-				"[concat(variables('factoryId'), '/pipelines/2 Fullload_onprem_to_Broze')]"
+				"[concat(variables('factoryId'), '/pipelines/2 Fullload_onprem_to_Broze')]",
+				"[concat(variables('factoryId'), '/pipelines/3 incremental_load_onpremSQL_to_Bronze')]"
 			]
 		}
 	]
