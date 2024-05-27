@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "Efn-Proj"
+		},
+		"ls_AzureDataLakeStorage_properties_typeProperties_url": {
+			"value": "https://efnblobproj.dfs.core.windows.net"
+		},
+		"ls_AzureKeyVault_properties_typeProperties_baseUrl": {
+			"value": "https://efn-proj-kv.vault.azure.net/"
+		},
+		"ls_Azure_SQL_properties_typeProperties_server": {
+			"value": "efnproject.database.windows.net"
+		},
+		"ls_Azure_SQL_properties_typeProperties_database": {
+			"value": "Efnproject"
+		},
+		"ls_Azure_SQL_properties_typeProperties_userName": {
+			"value": "sqladmin"
+		},
+		"ls_onprem_sql_properties_typeProperties_server": {
+			"value": "AJAY"
+		},
+		"ls_onprem_sql_properties_typeProperties_database": {
+			"value": "Efnproject"
+		},
+		"ls_onprem_sql_properties_typeProperties_userName": {
+			"value": "sa"
+		}
+	}
+}
