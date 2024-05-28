@@ -5,8 +5,14 @@
 		"factoryName": {
 			"value": "Efn-Proj"
 		},
+		"ls_AzureDatabricks_accessToken": {
+			"value": ""
+		},
 		"ls_AzureDataLakeStorage_properties_typeProperties_url": {
 			"value": "https://efnblobproj.dfs.core.windows.net"
+		},
+		"ls_AzureDatabricks_properties_typeProperties_existingClusterId": {
+			"value": "0522-174515-5rfncrem"
 		},
 		"ls_AzureKeyVault_properties_typeProperties_baseUrl": {
 			"value": "https://efn-proj-kv.vault.azure.net/"
