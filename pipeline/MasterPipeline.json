@@ -5,8 +5,6 @@
 			{
 				"name": "Execute Hyderationfile",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureInput": false
@@ -23,8 +21,6 @@
 			{
 				"name": "Fullload from onprem to bronze",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Execute Hyderationfile",
@@ -48,8 +44,6 @@
 			{
 				"name": "Incrementallload from onprem to Bronze",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Execute Hyderationfile",
