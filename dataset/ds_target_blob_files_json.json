@@ -1,0 +1,27 @@
+{
+	"name": "ds_target_blob_files_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_AzureBlobStorage_test",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sinkname": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat(substring(dataset().sinkname,0,\nindexOf(dataset().sinkname,'.')),\nconcat(substring(utcnow(),0,4),substring(utcnow(),4,4),substring(utcnow(),8,2)),\n'.json')",
+					"type": "Expression"
+				},
+				"container": "target"
+			}
+		},
+		"schema": {}
+	}
+}
