@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "Efn-Proj"
 		},
+		"ls_AzureBlobStorage_test_connectionString": {
+			"value": ""
+		},
 		"ls_AzureDatabricks_accessToken": {
 			"value": ""
 		},

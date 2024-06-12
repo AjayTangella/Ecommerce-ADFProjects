@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "Efn-Proj"
 		},
+		"ls_AzureBlobStorage_test_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_AzureBlobStorage_test'"
+		},
 		"ls_AzureDatabricks_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'ls_AzureDatabricks'"
@@ -73,6 +77,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"ls_AzureBlobStorage_test_connectionString": {
+						"value": "[parameters('ls_AzureBlobStorage_test_connectionString')]"
 					},
 					"ls_AzureDatabricks_accessToken": {
 						"value": "[parameters('ls_AzureDatabricks_accessToken')]"
