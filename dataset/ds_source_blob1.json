@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"container": "source"
+				"container": "data"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
