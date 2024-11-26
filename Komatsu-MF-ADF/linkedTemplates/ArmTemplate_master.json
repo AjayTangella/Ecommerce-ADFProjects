@@ -15,6 +15,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ds_target_sharepoint_file'"
 		},
+		"ls_ADLS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_ADLS'"
+		},
+		"ls_ADLS_insurance_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_ADLS_insurance'"
+		},
 		"ls_AzureBlobStorage_test_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_AzureBlobStorage_test'"
@@ -28,6 +36,10 @@
 			"metadata": "Secure string for 'password' of 'ls_onprem_sql_Insurance'"
 		},
 		"ds_hyderationfile_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cignainsurance.dfs.core.windows.net/"
+		},
+		"ls_ADLS_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://cignainsurance.dfs.core.windows.net/"
 		},
@@ -112,6 +124,12 @@
 					"ds_target_sharepoint_file_connectionString": {
 						"value": "[parameters('ds_target_sharepoint_file_connectionString')]"
 					},
+					"ls_ADLS_accountKey": {
+						"value": "[parameters('ls_ADLS_accountKey')]"
+					},
+					"ls_ADLS_insurance_connectionString": {
+						"value": "[parameters('ls_ADLS_insurance_connectionString')]"
+					},
 					"ls_AzureBlobStorage_test_connectionString": {
 						"value": "[parameters('ls_AzureBlobStorage_test_connectionString')]"
 					},
@@ -120,6 +138,9 @@
 					},
 					"ds_hyderationfile_properties_typeProperties_url": {
 						"value": "[parameters('ds_hyderationfile_properties_typeProperties_url')]"
+					},
+					"ls_ADLS_properties_typeProperties_url": {
+						"value": "[parameters('ls_ADLS_properties_typeProperties_url')]"
 					},
 					"ls_AzureDatabricks_properties_typeProperties_existingClusterId": {
 						"value": "[parameters('ls_AzureDatabricks_properties_typeProperties_existingClusterId')]"

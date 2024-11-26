@@ -11,6 +11,12 @@
 		"ds_target_sharepoint_file_connectionString": {
 			"value": ""
 		},
+		"ls_ADLS_accountKey": {
+			"value": ""
+		},
+		"ls_ADLS_insurance_connectionString": {
+			"value": ""
+		},
 		"ls_AzureBlobStorage_test_connectionString": {
 			"value": ""
 		},
@@ -21,6 +27,9 @@
 			"value": ""
 		},
 		"ds_hyderationfile_properties_typeProperties_url": {
+			"value": "https://cignainsurance.dfs.core.windows.net/"
+		},
+		"ls_ADLS_properties_typeProperties_url": {
 			"value": "https://cignainsurance.dfs.core.windows.net/"
 		},
 		"ls_AzureDataLakeStorage_properties_typeProperties_url": {
