@@ -210,7 +210,7 @@
 									{
 										"type": "Query",
 										"text": {
-											"value": "update [dbo].[watermarktable] set watermarkdate='@{activity('Lookup for watermarkdate').output.firstRow.max_date}' where Tablename='@{item().TableName}'",
+											"value": "update [dbo].[watermarktable] set watermarkdate='@{activity('modified date from tables').output.firstRow.max_date}' where TableName='@{item().TableName}'",
 											"type": "Expression"
 										}
 									}
