@@ -1,0 +1,208 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "Komatsu-MF-ADF"
+		},
+		"ds_hyderationfile_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ds_hyderationfile'"
+		},
+		"ds_target_sharepoint_file_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ds_target_sharepoint_file'"
+		},
+		"ls_AzureBlobStorage_test_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_AzureBlobStorage_test'"
+		},
+		"ls_AzureDatabricks_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'ls_AzureDatabricks'"
+		},
+		"ls_onprem_sql_Insurance_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_onprem_sql_Insurance'"
+		},
+		"ds_hyderationfile_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cignainsurance.dfs.core.windows.net/"
+		},
+		"ls_AzureDataLakeStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://efnblobproj.dfs.core.windows.net"
+		},
+		"ls_AzureDatabricks_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0522-174515-5rfncrem"
+		},
+		"ls_AzureKeyVault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://efn-proj-kv.vault.azure.net/"
+		},
+		"ls_Azure_SQL_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "efnproject.database.windows.net"
+		},
+		"ls_Azure_SQL_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "Efnproject"
+		},
+		"ls_Azure_SQL_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "sqladmin"
+		},
+		"ls_onprem_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "AJAY"
+		},
+		"ls_onprem_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "Efnproject"
+		},
+		"ls_onprem_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "sa"
+		},
+		"ls_onprem_sql_Insurance_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "AJAY"
+		},
+		"ls_onprem_sql_Insurance_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "Insurance_Project"
+		},
+		"ls_onprem_sql_Insurance_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "AJAY\\Ajay"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "Komatsu-MF-ADF_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ds_hyderationfile_accountKey": {
+						"value": "[parameters('ds_hyderationfile_accountKey')]"
+					},
+					"ds_target_sharepoint_file_connectionString": {
+						"value": "[parameters('ds_target_sharepoint_file_connectionString')]"
+					},
+					"ls_AzureBlobStorage_test_connectionString": {
+						"value": "[parameters('ls_AzureBlobStorage_test_connectionString')]"
+					},
+					"ls_AzureDatabricks_accessToken": {
+						"value": "[parameters('ls_AzureDatabricks_accessToken')]"
+					},
+					"ds_hyderationfile_properties_typeProperties_url": {
+						"value": "[parameters('ds_hyderationfile_properties_typeProperties_url')]"
+					},
+					"ls_AzureDatabricks_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('ls_AzureDatabricks_properties_typeProperties_existingClusterId')]"
+					},
+					"ls_AzureKeyVault_properties_typeProperties_baseUrl": {
+						"value": "[parameters('ls_AzureKeyVault_properties_typeProperties_baseUrl')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "Komatsu-MF-ADF_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ls_onprem_sql_Insurance_password": {
+						"value": "[parameters('ls_onprem_sql_Insurance_password')]"
+					},
+					"ls_AzureDataLakeStorage_properties_typeProperties_url": {
+						"value": "[parameters('ls_AzureDataLakeStorage_properties_typeProperties_url')]"
+					},
+					"ls_Azure_SQL_properties_typeProperties_server": {
+						"value": "[parameters('ls_Azure_SQL_properties_typeProperties_server')]"
+					},
+					"ls_Azure_SQL_properties_typeProperties_database": {
+						"value": "[parameters('ls_Azure_SQL_properties_typeProperties_database')]"
+					},
+					"ls_Azure_SQL_properties_typeProperties_userName": {
+						"value": "[parameters('ls_Azure_SQL_properties_typeProperties_userName')]"
+					},
+					"ls_onprem_sql_properties_typeProperties_server": {
+						"value": "[parameters('ls_onprem_sql_properties_typeProperties_server')]"
+					},
+					"ls_onprem_sql_properties_typeProperties_database": {
+						"value": "[parameters('ls_onprem_sql_properties_typeProperties_database')]"
+					},
+					"ls_onprem_sql_properties_typeProperties_userName": {
+						"value": "[parameters('ls_onprem_sql_properties_typeProperties_userName')]"
+					},
+					"ls_onprem_sql_Insurance_properties_typeProperties_server": {
+						"value": "[parameters('ls_onprem_sql_Insurance_properties_typeProperties_server')]"
+					},
+					"ls_onprem_sql_Insurance_properties_typeProperties_database": {
+						"value": "[parameters('ls_onprem_sql_Insurance_properties_typeProperties_database')]"
+					},
+					"ls_onprem_sql_Insurance_properties_typeProperties_userName": {
+						"value": "[parameters('ls_onprem_sql_Insurance_properties_typeProperties_userName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'Komatsu-MF-ADF_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "Komatsu-MF-ADF_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'Komatsu-MF-ADF_ArmTemplate_1')]"
+			]
+		}
+	]
+}
