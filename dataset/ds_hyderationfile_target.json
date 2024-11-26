@@ -1,0 +1,27 @@
+{
+	"name": "ds_hyderationfile_target",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ds_target_sharepoint_file",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Hyderation_file.csv",
+				"folderPath": {
+					"value": "@formatDateTime(utcNow(),'yyyy/mm/dd')",
+					"type": "Expression"
+				},
+				"container": "hyderationfile"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

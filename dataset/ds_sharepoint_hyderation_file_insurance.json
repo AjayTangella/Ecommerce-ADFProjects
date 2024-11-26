@@ -1,0 +1,23 @@
+{
+	"name": "ds_sharepoint_hyderation_file_insurance",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ds_hyderationfile",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Hyderation.xlsx",
+				"fileSystem": "hyderationfile"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
