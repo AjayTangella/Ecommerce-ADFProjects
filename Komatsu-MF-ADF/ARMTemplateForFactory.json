@@ -238,6 +238,148 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/1 Insurnce_fullload_Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup for all full load tables list",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": {
+									"value": "select * from dbo.Maintanance where load_type='F' and status=1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_onpremsql_insurance",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach for all full load tables",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup for all full load tables list",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup for all full load tables list').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy full load for all tables",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_onprem_sql_fullload_tables",
+											"type": "DatasetReference",
+											"parameters": {
+												"SchemaName": {
+													"value": "@item().SchemaName",
+													"type": "Expression"
+												},
+												"TableName": {
+													"value": "@item().TableName",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_fullload_parque_list",
+											"type": "DatasetReference",
+											"parameters": {
+												"FolderName": {
+													"value": "@concat(item().SchemaName,'-',item().TableName)",
+													"type": "Expression"
+												},
+												"FileName": {
+													"value": "@{concat(item().TableName,'.parquet')}",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Insurance_Project"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_onpremsql_insurance')]",
+				"[concat(variables('factoryId'), '/datasets/ds_onprem_sql_fullload_tables')]",
+				"[concat(variables('factoryId'), '/datasets/ds_fullload_parque_list')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/2 Fullload_onprem_to_Broze')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -374,6 +516,250 @@
 				"[concat(variables('factoryId'), '/datasets/ds_azure_sql_server')]",
 				"[concat(variables('factoryId'), '/datasets/ds_onprem_sql_fullload_tables')]",
 				"[concat(variables('factoryId'), '/datasets/ds_from_onprem_to_broze_fullload')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/3 Insurance_Incremental_Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Incremental tables list",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": {
+									"value": "select * from [dbo].[Maintanance]\nwhere load_type='I' and status=1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_onpremsql_insurance",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach list for all incremental tables list",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Incremental tables list",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Incremental tables list').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Lookup for watermarkdate",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderQuery": {
+												"value": "select watermarkdate as watermarkdate from [dbo].[watermarktable]\nwhere Tablename='@{item().TableName}'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_onpremsql_insurance",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "modified date from tables",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderQuery": {
+												"value": "select max(date_of_claim) as max_date from @{item().SchemaName}.@{item().TableName}",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_onpremsql_insurance",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "Copy all incremental tables to parque",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Lookup for watermarkdate",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "modified date from tables",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderQuery": {
+												"value": "@concat('select * from ',item().SchemaName,'.',item().TableName,' where date_of_claim > ''',activity('Lookup for watermarkdate').output.firstRow.watermarkdate,''' and date_of_claim<=''',activity('modified date from tables').output.firstRow.max_date,'''')\n",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_onpremsql_insurance",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Insurance_incremetal_parque",
+											"type": "DatasetReference",
+											"parameters": {
+												"FileName": {
+													"value": "@concat(item().TableName,'.parque')",
+													"type": "Expression"
+												},
+												"FolderName": {
+													"value": "@item().TableName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "update watermarkdate",
+									"type": "Script",
+									"dependsOn": [
+										{
+											"activity": "Copy all incremental tables to parque",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "ls_onprem_sql_Insurance",
+										"type": "LinkedServiceReference"
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": {
+													"value": "update [dbo].[watermarktable] set watermarkdate='@{activity('Lookup for watermarkdate').output.firstRow.max_date}' where Tablename='@{item().TableName}'",
+													"type": "Expression"
+												}
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Insurance_Project"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_onpremsql_insurance')]",
+				"[concat(variables('factoryId'), '/datasets/Insurance_incremetal_parque')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_onprem_sql_Insurance')]"
 			]
 		},
 		{
@@ -801,148 +1187,6 @@
 				"[concat(variables('factoryId'), '/datasets/ds_hydrationfile_sharefolder')]",
 				"[concat(variables('factoryId'), '/datasets/ds_hydrationfile_targetlist_insurance')]",
 				"[concat(variables('factoryId'), '/datasets/ds_onpremsql_insurance')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Insurnce_fullload')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup for all full load tables list",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderQuery": {
-									"value": "select * from dbo.Maintanance where load_type='F' and status=1",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "ds_onpremsql_insurance",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach for all full load tables",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup for all full load tables list",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup for all full load tables list').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Copy full load for all tables",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlServerSource",
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "ParquetSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "ParquetWriteSettings"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_onprem_sql_fullload_tables",
-											"type": "DatasetReference",
-											"parameters": {
-												"SchemaName": {
-													"value": "@item().SchemaName",
-													"type": "Expression"
-												},
-												"TableName": {
-													"value": "@item().TableName",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "ds_fullload_parque_list",
-											"type": "DatasetReference",
-											"parameters": {
-												"FolderName": {
-													"value": "@concat(item().SchemaName,'-',item().TableName)",
-													"type": "Expression"
-												},
-												"FileName": {
-													"value": "@{concat(item().TableName,'.parquet')}",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "Insurance_Project"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_onpremsql_insurance')]",
-				"[concat(variables('factoryId'), '/datasets/ds_onprem_sql_fullload_tables')]",
-				"[concat(variables('factoryId'), '/datasets/ds_fullload_parque_list')]"
 			]
 		},
 		{
@@ -1905,6 +2149,46 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_AzureDataLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Insurance_incremetal_parque')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_ADLS",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FileName": {
+						"type": "string"
+					},
+					"FolderName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().FileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@concat('Insurance_Incremetal','/',formatDateTime(utcNow(),'yyyy/MM/dd'),'/',dataset().FolderName)",
+							"type": "Expression"
+						},
+						"fileSystem": "landing"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_ADLS')]"
 			]
 		},
 		{
@@ -3387,21 +3671,6 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Incremental')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "Insurance_Project"
-				},
-				"annotations": []
 			},
 			"dependsOn": []
 		}
