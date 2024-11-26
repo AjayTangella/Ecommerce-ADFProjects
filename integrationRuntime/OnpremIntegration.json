@@ -1,0 +1,6 @@
+{
+	"name": "OnpremIntegration",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
