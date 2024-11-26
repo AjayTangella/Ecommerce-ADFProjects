@@ -1,0 +1,9 @@
+{
+	"name": "Komatsu-MF-ADF",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "785f00a2-8c16-4468-b650-fec24bfc9d61",
+		"tenantId": "5b8f491e-4680-4384-8d7f-c2bde51ca7c5"
+	}
+}
