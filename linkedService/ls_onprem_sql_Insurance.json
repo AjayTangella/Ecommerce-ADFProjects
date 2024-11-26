@@ -1,0 +1,21 @@
+{
+	"name": "ls_onprem_sql_Insurance",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"server": "AJAY",
+			"database": "Insurance_Project",
+			"encrypt": "optional",
+			"trustServerCertificate": false,
+			"authenticationType": "Windows",
+			"userName": "AJAY\\Ajay",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJjMmIyNjdjNS1lYjc0LTRhMGYtYTYwNi1jNzBmOGUzMmI3MDUiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "Onpremintegrtion1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
