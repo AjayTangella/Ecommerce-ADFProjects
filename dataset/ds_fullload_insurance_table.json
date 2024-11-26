@@ -1,0 +1,20 @@
+{
+	"name": "ds_fullload_insurance_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_onprem_sql_Insurance",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"schema": {
+				"type": "string"
+			},
+			"TableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}

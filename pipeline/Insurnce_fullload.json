@@ -1,0 +1,131 @@
+{
+	"name": "Insurnce_fullload",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup for all full load tables list",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "select * from dbo.Maintanance where load_type='F' and status=1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_onpremsql_insurance",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach for all full load tables",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup for all full load tables list",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup for all full load tables list').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy full load for all tables",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_onprem_sql_fullload_tables",
+									"type": "DatasetReference",
+									"parameters": {
+										"SchemaName": {
+											"value": "@item().SchemaName",
+											"type": "Expression"
+										},
+										"TableName": {
+											"value": "@item().TableName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_fullload_parque_list",
+									"type": "DatasetReference",
+									"parameters": {
+										"FolderName": {
+											"value": "@concat(item().SchemaName,'-',item().TableName)",
+											"type": "Expression"
+										},
+										"FileName": {
+											"value": "@{concat(item().TableName,'.parquet')}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "Insurance_Project"
+		},
+		"annotations": []
+	}
+}

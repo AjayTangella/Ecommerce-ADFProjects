@@ -2,7 +2,7 @@
 	"name": "ds_onprem_sql_fullload_tables",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_onprem_sql",
+			"referenceName": "ls_onprem_sql_Insurance",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
