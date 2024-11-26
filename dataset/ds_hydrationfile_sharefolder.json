@@ -1,0 +1,42 @@
+{
+	"name": "ds_hydrationfile_sharefolder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ds_hyderationfile",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Sheet1",
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Hyderation.xlsx",
+				"fileSystem": "hyderationfile"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "S.No",
+				"type": "String"
+			},
+			{
+				"name": "SchemaName",
+				"type": "String"
+			},
+			{
+				"name": "TableName",
+				"type": "String"
+			},
+			{
+				"name": "Load_Type",
+				"type": "String"
+			},
+			{
+				"name": "Status",
+				"type": "String"
+			}
+		]
+	}
+}

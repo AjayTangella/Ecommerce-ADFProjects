@@ -1,0 +1,38 @@
+{
+	"name": "ds_onpremsql_insurance",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_onprem_sql_Insurance",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "S.No",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SchemaName",
+				"type": "varchar"
+			},
+			{
+				"name": "TableName",
+				"type": "varchar"
+			},
+			{
+				"name": "Load_Type",
+				"type": "varchar"
+			},
+			{
+				"name": "Status",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Maintanance"
+		}
+	}
+}
