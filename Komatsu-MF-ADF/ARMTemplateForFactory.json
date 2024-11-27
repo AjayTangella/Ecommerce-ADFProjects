@@ -628,7 +628,7 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"FolderName": {
-													"value": "@concat(item().SchemaName,'-',item().TableName)",
+													"value": "@{item().TableName}",
 													"type": "Expression"
 												},
 												"FileName": {
@@ -850,6 +850,8 @@
 								{
 									"name": "update watermarkdate",
 									"type": "Script",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Copy all incremental tables to parque",
@@ -881,6 +883,87 @@
 											}
 										],
 										"scriptBlockExecutionTimeout": "02:00:00"
+									}
+								},
+								{
+									"name": "update watermarkdate_copy1",
+									"type": "Script",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "Copy all incremental tables to parque",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "ls_onprem_sql_Insurance",
+										"type": "LinkedServiceReference"
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": {
+													"value": "@concat('update [dbo].[watermarktable] set watermarkdate= ''',activity('modified date from tables').output.firstRow.max_date,''' where TableName= ''',item().TableName,'''')",
+													"type": "Expression"
+												}
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
+									}
+								},
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Copy all incremental tables to parque",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[sp_watermarktable]",
+										"storedProcedureParameters": {
+											"date_of_claim": {
+												"value": {
+													"value": "@activity('modified date from tables').output.firstRow.max_date",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"TableName": {
+												"value": {
+													"value": "@item().TableName",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_onprem_sql_Insurance",
+										"type": "LinkedServiceReference"
 									}
 								}
 							]
@@ -2417,7 +2500,7 @@
 							"type": "Expression"
 						},
 						"folderPath": {
-							"value": "@concat(formatDateTime(utcNow(),'yyyy/MM/dd'),'/',dataset().FolderName)",
+							"value": "@concat('Full/',formatDateTime(utcNow(),'yyyy/MM/dd'),'/',dataset().FolderName)",
 							"type": "Expression"
 						},
 						"container": "landing"
