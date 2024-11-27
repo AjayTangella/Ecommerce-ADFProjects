@@ -23,6 +23,9 @@
 				}
 			}
 		],
+		"folder": {
+			"name": "Komatsu"
+		},
 		"annotations": []
 	}
 }

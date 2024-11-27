@@ -124,6 +124,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "Komatsu"
+		},
 		"annotations": [],
 		"lastPublishTime": "2024-05-27T09:35:16Z"
 	},
