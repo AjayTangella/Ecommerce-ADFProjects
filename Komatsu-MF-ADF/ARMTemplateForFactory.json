@@ -2261,7 +2261,7 @@
 							"type": "Expression"
 						},
 						"folderPath": {
-							"value": "@concat('Insurance_Incremetal','/',formatDateTime(utcNow(),'yyyy/MM/dd'),'/',dataset().FolderName)",
+							"value": "@concat('Incremetal','/',formatDateTime(utcNow(),'yyyy/MM/dd'),'/',dataset().FolderName)",
 							"type": "Expression"
 						},
 						"fileSystem": "landing"
